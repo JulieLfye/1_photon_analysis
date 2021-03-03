@@ -33,21 +33,15 @@ run_txt = ['Run ' num2str(d) num2str(u)];
 folder_name = 'tail_cropped';
 tifname = 'trial_1_grey.tif';
 
-% load 1 frame
+% load movie
 path = fullfile(root,study,date,run_txt,'behavior',folder_name);
 
-infoTiff = imfinfo(fullfile(path,tifname));
-
-
-% prepare memory
-im = zeros(infoTiff(1).Height,infoTiff(1).Width,length(infoTiff));
-
-% load all movie frames
-tic
-for k = 1:length(infoTiff)
-    im(:,:,k) = imread(fullfile(path,tifname),'Index',k);
-    if mod(k,2000) == 0
-        fprintf('opening image %d \n', k)
-    end
+tstack = Tiff(fullfile(path,tifname));
+[I,J] = size(tstack.read());
+K = length(imfinfo(fullfile(path,tifname)));
+data = zeros(I,J,K);
+data(:,:,1)  = tstack.read();
+for n = 2:K
+    tstack.nextDirectory()
+    data(:,:,n) = tstack.read();
 end
-toc
