@@ -16,7 +16,8 @@ clear;
 close all;
 clc;
 
-root = '/home/julie/Sciences/Danionella';
+% root = '/home/julie/Sciences/Danionella';
+root = '/media/ljp/Julie_Data/Data/Danionella/Calcium_imaging';
 % root = '/run/media/julie/Julie_Data/Data/Danionella/Calcium_imaging';
 % root = '/home/julie/Sciences';
 % root = '/home/ljp/Sciences';
@@ -44,4 +45,8 @@ data(:,:,1)  = tstack.read();
 for n = 2:K
     tstack.nextDirectory()
     data(:,:,n) = tstack.read();
+     if mod(n,2000) == 0
+        fprintf('opening image %d \n', n)
+    end
+    
 end
