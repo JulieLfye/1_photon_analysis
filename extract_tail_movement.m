@@ -40,72 +40,45 @@ path = fullfile(root,study,date,run_txt,'behavior',folder_name);
 v = VideoReader(fullfile(path,avi_name));
 
 
-%%
-tail_matrix = zeros(v.NumFrames,v.Height);
-pks = zeros(v.NumFrames,1);
-locs = pks;
-
+%% code Georges
 tic
-% for k = 1:v.NumFrames
-for k = 1:1501
-    im = read(v,k);
-    m = sum(im(:,:,1),2)';
-    tail_matrix(k,:) = m/max(m);
-    [p,l] = findpeaks(tail_matrix(k,:),'NPeaks',1,'MinPeakProminence',0.05);
-    if isempty(p) == 0
-        pks(k) = p;
-        locs(k) = l;
-    else
-        pks(k) = nan;
-        locs(k) = nan;
-    end
-    
-    if mod(k,2000) == 0
-        fprintf('image %d \n', k)
-    end
-end
+video = read(v,[1 121200]);
 toc
+stack=squeeze(video(:,:,1,:));
+clear video
 
-% pb im 1200, 1136
+ 
+grey_stack=mean(stack,3);
+prof=mean(grey_stack,2);
 
-locs(1502:end,:) = [];
-% time = 0:0.01:15;
-plot(locs)
+ 
+x=[1:size(prof)];
+y=nan(size(prof));
+y([1:40])=prof([1:40]);
+y([1:40])=prof([1:40]);
+y([70:end])=prof([70:end]);
 
-return
+idxValid = [x(1:40), x(70:end)];
+f=fit(x(idxValid)',y(idxValid),'smoothingspline');
 
-%% test correlation
-close
+plot(x,prof-f(x));
 
-tail_1 = read(v,1);
-tail_1 = tail_1(:,:,1);
-tail_1 = sum(tail_1,2);
-tail_1 = tail_1/max(tail_1);
-
-tail_2 = read(v,32802);
-tail_2 = tail_2(:,:,1);
-tail_2 = sum(tail_2,2);
-tail_2 = tail_2/max(tail_2);
-
-[xcc, lags] = xcorr(tail_1,tail_2, 'normalized');
-w = conv(tail_1, tail_2);
-[argvalue, argmax] = max(w);
-dtw(tail_1, tail_2);
-figure
-plot(w);
-figure
-plot(tail_1);
-hold on
-plot(tail_2);
-figure
-plot(lags,xcc)
-
-%% test peak
+profiles=squeeze(mean(stack,2))-f(x);
+toc
+%%
 close all
+ref = 1;
+comp = 1136;
+[c, lags] = xcorr(profiles(:,ref), profiles(:,comp));
 
-[pks,locs] = findpeaks(tail_1,'NPeaks',1,'MinPeakProminence',0.05);
-[pksw,locsw] = findpeaks(tail_1,'Npeaks',1,'MinPeakWidth',5);
-plot(tail_1)
+figure
+plot(profiles(:,ref))
 hold on
-plot(locs,pks,'ro')
-plot(locsw,pksw,'ko')
+plot(profiles(:,comp))
+
+figure
+plot(lags,c)
+
+
+for k = 2:length(profiles)
+    
