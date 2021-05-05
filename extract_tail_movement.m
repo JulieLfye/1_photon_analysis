@@ -16,14 +16,15 @@ clear;
 close all;
 clc;
 
-root = '/home/julie/Sciences/Danionella';
+% root = '/home/julie/Sciences/Danionella';
 % root = '/media/ljp/Julie_Data/Data/Danionella/Calcium_imaging';
 % root = '/run/media/julie/Julie_Data/Data/Danionella/Calcium_imaging';
 % root = '/home/julie/Sciences';
 % root = '/home/ljp/Sciences';
+root = '/media/ljp/Data2/Data/Danionella/Calcium_imaging/1_photon';
 study = '1_photon';
-date = '2021-02-19';
-run = 4;
+date = '2021-04-19';
+run = 2;
 d = floor(run/10);
 u = floor(run - d*10);
 run_txt = ['Run ' num2str(d) num2str(u)];
